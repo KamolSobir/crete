@@ -1,0 +1,145 @@
+{% extends 'detail/base.html' %}
+
+{% block content %}
+    <div style="margin: 20px 0 0 0"></div>
+        <div class="card" style="margin: 0 auto; background-color: aqua; width: 650px;">
+                    <div class="card-header">
+                        {% if photos %}
+                            {% for photo in photos %}
+                                <div style="width: 100%; display: flex; flex-direction: row">
+                                    <a data-bs-toggle="modal" href="#exampleModalToggle2"><img style="border-radius: 50%" src="{{ photo.photos.url }}" alt="image" height="60px" width="60px"></a>
+                                        <div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+                                          <div class="modal-dialog modal-dialog-centered" style="margin:0 auto">
+                                            <div style="background-color: black; width: auto; margin: 0 auto;" class="modal-content">
+                                              <div class="modal-header">
+                                                <h1 style="color: white" class="modal-title fs-5" id="exampleModalToggleLabel2">{{ photo.author }}</h1>
+                                                <button style="background-color: white" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                              </div>
+                                              <div class="modal-body">
+                                                <img style="max-width: 600px; background-color: white" src="{{ photo.photos.url }}">
+                                              </div>
+                                              <div class="modal-footer">
+                                                <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Ok</button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                    <div style="width: 100%; display: flex; flex-direction: row;">
+                                        <span style="margin: 10px 0 0 30px; display:inline-block;"><h4 style="display: inline">{{ photo.author }}</h4></span>
+                                        <div style="width: 100%; display: inline-block; padding-top: 12px; margin-right: 20px"><h5 style="text-align: right;">{{ photo.data_photo }}</h5></div>
+                                    </div>
+                                </div>
+
+                                <a style="letter-spacing: 0; font-size: small" href="{% url 'photo_update' photo.pk %}">add image</a>
+                            {% endfor %}
+
+                        {% else %}
+
+                            {% for user in users %}
+                                <img style="border-radius: 50%" src="../../media/image/png-transparent-user-profile-computer-icons-login-user-avatars.png" alt="image" height="60px" width="60px">
+                                <span style="margin: 0 0 0 20px"><h4 style="display: inline">{{ user.username }}</h4></span>
+                                <h5 style="display: inline; padding-left: 25%">{{ user.date_joined }}</h5><br>
+                                <a style="letter-spacing: 0; font-size: small" href="{% url 'photo_create' %}">add image</a>
+                            {% endfor %}
+
+                        {% endif %}
+
+                        {% for photo in photos %}
+                           <h5 style="margin-top: 5px">Follows - <a class="text-decoration-none" data-bs-toggle="modal" href="#exampleModalToggle3"><span>{{ photo.follow.count }}</span></a></h5>
+                            <div class="modal fade" id="exampleModalToggle3" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+                              <div class="modal-dialog modal-dialog-centered" style="margin:0 auto">
+                                <div style="background-color: black; margin: 0 auto;" class="modal-content">
+                                  <div class="modal-header">
+                                    <h1 style="color: white" class="modal-title fs-5" id="exampleModalToggleLabel2">{{ crate_photo.author }}</h1>
+                                    <button style="background-color: white" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                  </div>
+                                  <div class="modal-body">
+                                      {% for user in users1 %}
+                                        {% if user in photo.follow.all %}
+                                            <button class="btn btn-success  btn-send" style="margin: 3px 5px;">
+                                                <a style="color: white; text-decoration: none;" id="name_list" href="{% url 'my_project_id' user.id %}">{{ user.username }}</a><br>
+                                            </button><br>
+                                        {% endif %}
+                                      {% endfor %}
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Ok</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+
+                    {% for post in posts %}
+                        <div class="card" style="margin: 0 auto; background-color: aqua; width: 650px; border-radius: 0%">
+                          <div style="margin: 30px 40px; border: 1px solid darkgrey; border-radius: 5px">
+                            <div class="card-header">
+                                <span style="margin-right: 20px; font-size:larger">{{ post.author }}</span>
+                                <span style="font-weight: bolder">{{ post.date_posted }}</span>
+                            </div>
+                            <div class="card-body" style="box-shadow: black">
+                                <h5 class="card-title" style="font-weight: bold">{{ post.title }}</h5>
+                                <p class="card-text" style="font-weight: lighter">{{ post.content }}</p>
+                                <a href="{% url 'update' post.id %}" class="btn btn-primary">update</a>
+                                <a href="{% url 'delete' post.id %}" class="btn btn-primary">delete</a>
+                                 <button style="border: transparent; background-color: aqua;" type="button" name="post_id"
+                                    value="{{ post.id }}" onclick="like_post('{{ post.pk }}')" id="id_btn_like_{{ post.pk }}">
+                                    <div>{% if request.user in post.likes.all %}&#x2764 {% else %} &#x1F5A4 {% endif %}</div>
+                                 </button>
+                                    <span id="btn_num_{{ post.id }}">{{ post.likes.count }}</span>
+                            </div>
+                          </div>
+                        </div>
+                    {% endfor %}
+        </div>
+{% endblock %}
+{% block extra_js %}
+    <script>
+        function like_post(post_id) {
+            post_data('{% url 'like-post' %}', {'post_id': post_id})
+        }
+
+        async function post_data(url, data, res) {
+            let form_data = new FormData();
+            for (let key in data) {
+                form_data.append(key, data[key]);
+            }
+            const response = await fetch(url,
+                {
+                    method: 'POST',
+                    cache: "no-cache",
+                    body: form_data
+                }
+            )
+                .then(response => {
+                    return response.json();
+                })
+                .then((response_data) => {
+                    console.log(response_data)
+                    let post_id = response_data['post_id']
+                    let count = response_data['count']
+                    if (response_data['status'] === 200) {
+                        let btn_color
+                        let btn_num
+                        if (response_data['btn_type'] === 'add') {
+                            btn_color = '&#x2764'
+                            btn_num = count + 1
+
+                        } else {
+                            btn_color = '&#x1F5A4'
+                            btn_num = count - 1
+
+                        }
+
+                        $(`#id_btn_like_${post_id}`).html(btn_color)
+                        $(`#btn_num_${post_id}`).html(btn_num)
+
+
+                    }
+                })
+        }
+    </script>
+{% endblock extra_js %}

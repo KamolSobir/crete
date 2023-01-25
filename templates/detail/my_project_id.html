@@ -1,0 +1,286 @@
+{% extends 'detail/base.html' %}
+
+{% block content %}
+<style>
+    main {
+        display:flex;
+        flex-direction: row;
+    }
+</style>
+<main>
+
+    <div class="avtor" style="margin-right: 20px">
+        {% for user in users %}
+            <div style="width: 400px; margin:30px 50px; display: flex; flex-direction: column; float-wrap: wrap " class="card">
+              <div class="card-body   name">
+                  <a class="a" href="{% url 'my_project_id' user.id %}">{{ user.username }}</a>
+              </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div>
+            <div style="margin: 50px 0 0 0">
+                    <div class="card" style="margin: 0 auto; background-color: aqua; width: 650px;">
+                            {% if crate_photos1 %}
+                                    {% for crate_photo in crate_photos1 %}
+                                        {% if request.user == crate_photo.author %}
+                                            <div class="card-header">
+                                                <div class="app" style="width: 100%; display: flex; flex-direction: row;">
+                                                    <img style="border-radius: 50%" src="{{ crate_photo.photos.url }}" alt="image" height="60px" width="60px">
+                                                    <span style="margin: 10px 0 0 30px; display:inline-block;"><h4 style="display: inline">{{ crate_photo.author }}</h4></span>
+                                                    <div style="width: 100%; display: inline-block; padding-top: 12px; margin-right: 20px"><h5 style="text-align: right;">{{ crate_photo.data_photo }}</h5></div>
+                                                    <p class="status">hello</p>
+
+                                                </div>
+
+                                                {% if follow %}
+                                                  <div style="display: flex; flex-direction: row">
+                                                      {% for foll in follow %}
+                                                          <h5 style="padding: 10px 0 0 0 ; text-align: left">Follows<span>- {{ foll.follow.count }}</span></h5>
+
+{#                                                            <button style="border: transparent; background-color: aqua;" type="button" name="post_id"#}
+{#                                                                    value="{{ foll.id }}" onclick="subscribe_user('{{ foll.id }}')" id="id_btn_follow_{{ foll.id }}">#}
+{#                                                                <div>{% if request.user in foll.follow.all %} <h5 style="background-color: darkgrey; color: black; border: 2px solid transparent" class="btn btn-primary btn-sm">Unsubscribe</h5> {% else %} <h5 style="background-color: red; border: 2px solid transparent" class="btn btn-primary btn-sm">Subscribe</h5> {% endif %}</div>#}
+{#                                                            </button>#}
+
+                                                      {% endfor %}
+                                                  </div>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+
+                                            <div class="card-header">
+                                                <div style="width: 100%; display: flex; flex-direction: row">
+                                                    <a data-bs-toggle="modal" href="#exampleModalToggle3"><img style="border-radius: 50%" src="{{ crate_photo.photos.url }}" alt="image" height="60px" width="60px"></a>
+                                                    <div class="modal fade" id="exampleModalToggle3" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+                                                      <div class="modal-dialog modal-dialog-centered" style="margin:0 auto">
+                                                        <div style="background-color: black; width: auto; margin: 0 auto;" class="modal-content">
+                                                          <div class="modal-header">
+                                                            <h1 style="color: white" class="modal-title fs-5" id="exampleModalToggleLabel2">{{ photo.author }}</h1>
+                                                            <button style="background-color: white" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                          </div>
+                                                          <div class="modal-body">
+                                                            <img style="max-width: 600px; background-color: white" src="{{ crate_photo.photos.url }}">
+                                                          </div>
+                                                          <div class="modal-footer">
+                                                            <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Ok</button>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+
+                                                    <div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+                                                      <div class="modal-dialog modal-dialog-centered" style="margin:0 auto">
+                                                        <div style="background-color: black; margin: 0 auto;" class="modal-content">
+                                                          <div class="modal-header">
+                                                            <h1 style="color: white" class="modal-title fs-5" id="exampleModalToggleLabel2">{{ crate_photo.author }}</h1>
+                                                            <button style="background-color: white" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                          </div>
+                                                          <div class="modal-body">
+                                                              {% for user in users %}
+                                                                {% if user in crate_photo.follow.all %}
+                                                                    <button class="btn btn-success  btn-send" style="margin: 3px 5px;">
+                                                                        <a style="color: white; text-decoration: none;" id="name_list">{{ user.username }}</a><br>
+                                                                    </button><br>
+                                                                {% endif %}
+                                                              {% endfor %}
+                                                          </div>
+                                                          <div class="modal-footer">
+                                                            <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Ok</button>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+
+                                                    <span style="margin: 10px 0 0 30px; display:inline-block;"><h4 style="display: inline">{{ crate_photo.author }}</h4></span>
+                                                    <div style="width: 100%; display: inline-block; padding-top: 12px; margin-right: 20px"><h5 style="text-align: right;">{{ crate_photo.data_photo }}</h5></div>
+                                                                                            <p class="status" data-user="{{ crate_photos1.all }}" style="padding: 16px 0px">hello</p>
+
+                                                </div>
+
+                                                {% if follow %}
+                                                  <div style="display: flex; flex-direction: row;">
+
+                                                      {% for foll in follow %}
+                                                          <div style="width: 100%; display: flex; flex-direction: row; justify-content: space-between">
+
+                                                            <h5 style="padding: 10px 0 0 0 ; text-align: left">Follows<span>- <a class="text-decoration-none" data-bs-toggle="modal" href="#exampleModalToggle2">{{ foll.follow.count }}</a></span></h5>
+
+                                                            <button style="border: transparent; background-color: transparent; padding-top: 7px; padding-right: 20px;" type="button" name="post_id"
+                                                                    value="{{ foll.id }}" onclick="subscribe_user('{{ foll.id }}')" id="id_btn_follow_{{ foll.id }}">
+                                                                <div>{% if request.user in foll.follow.all %} <h5 style="background-color: darkgrey; color: black; border: 2px solid transparent" class="btn btn-primary btn-sm">Unsubscribe</h5> {% else %} <h5 style="background-color: red; border: 2px solid transparent" class="btn btn-primary btn-sm">Subscribe</h5> {% endif %}</div>
+                                                            </button>
+
+                                                          </div>
+                                                      {% endfor %}
+
+                                                  </div>
+                                                {% endif %}
+
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+
+                            {% else %}
+
+                                {% for user in users1 %}
+                                            <div class="card-header">
+                                                <img style="border-radius: 50%" src="../../media/image/png-transparent-user-profile-computer-icons-login-user-avatars.png" alt="image" height="60px" width="60px">
+                                                <span style="margin: 0 0 0 20px"><h4 style="display: inline">{{ user.username }}</h4></span>
+                                                <h5 style="display: inline; padding-left: 25%">{{ user.date_joined }}</h5><br>
+                                            </div>
+
+
+{#                                      {% if follow %}#}
+{#                                          <div style="display: flex; flex-direction: row">#}
+{#                                              {% for foll in follow %}#}
+{#                                                <h5 style="padding: 10px 0 0 0 ; text-align: left">Follows <span>- {{ foll.follow.count }}</span></h5>#}
+
+{#                                                  <button style="border: transparent; background-color: aqua;" type="button" name="post_id"#}
+{#                                                          value="{{ foll.id }}" onclick="subscribe_user('{{ foll.id }}')" id="id_btn_follow_{{ foll.id }}">#}
+{#                                                      <div>{% if request.user in foll.follow.all %} <h5 style="background-color: darkgrey; color: black; border: 2px solid transparent" class="btn btn-primary btn-sm">Unsubscribe</h5> {% else %} <h5 style="background-color: red; border: 2px solid transparent" class="btn btn-primary btn-sm">Subscribe</h5> {% endif %}</div>#}
+{#                                                  </button>#}
+
+{#                                                <form style="width: 400px; text-align: right; padding-top:7px " action="{% url 'subscribe-post' foll.id %}" method="POST">#}
+{#                                                   {% csrf_token %}#}
+{#                                                   {% if request.user in foll.follow.all %}#}
+{#                                                       <button type="submit" name="post_id" value="{{foll.pk}}" class="btn btn-primary btn-sm">Unsubscribe</button>#}
+{#                                                   {% else %}#}
+{#                                                       <button type="submit" name="post_id" value="{{foll.pk}}" style="background-color: red" class="btn btn-primary btn-sm">Subscribe</button>#}
+{#                                                   {% endif %}#}
+{#                                                <span id="btn_num_follows_{{ foll.id }}">{{ foll.follow.count }}</span>#}
+{#                                                </form>#}
+
+{#                                              {% endfor %}#}
+{#                                          </div>#}
+{#                                      {% endif %}#}
+                                {% endfor %}
+
+                            {% endif %}
+
+                            {% for post in posts %}
+                                <div style="margin: 30px 40px; border: 1px solid darkgrey; border-radius: 5px">
+                                    <div class="card-header">
+                                        <span style="font-weight: bolder">{{ post.date_posted }}</span>
+                                    </div>
+                                    <div class="card-body" style="box-shadow: black">
+                                        <h5 class="card-title" style="font-weight: bold">{{ post.title }}</h5>
+                                        <p class="card-text" style="font-weight: lighter">{{ post.content }}</p>
+                                        <button style="border: transparent; background-color: aqua;" type="button" name="post_id"
+                                                value="{{ post.id }}" onclick="like_post('{{ post.pk }}')" id="id_btn_like_{{ post.pk }}">
+                                                <div>{% if request.user in post.likes.all %}&#x2764 {% else %} &#x1F5A4 {% endif %}</div>
+                                        </button>
+                                        <span id="btn_num_{{ post.id }}">{{ post.likes.count }}</span>
+
+                                    </div>
+                                </div>
+
+                            {% endfor %}
+
+                    </div>
+            </div>
+    </div>
+</main>
+{% endblock %}
+{% block extra_js %}
+    <script>
+        function like_post(post_id) {
+            post_data('{% url 'like-post' %}', {'post_id': post_id})
+        }
+
+        function subscribe_user(foll_id) {
+            post_data('{% url 'subscribe-post' %}', {'foll_id': foll_id})
+             if (foll_id){
+                location.reload();
+              }
+        }
+
+        async function post_data(url, data, url1, data1) {
+            let form_data = new FormData();
+            for (let key in data) {
+                form_data.append(key, data[key]);
+            }
+            const response = await fetch(url,
+               {
+                   method: 'POST',
+                   cache: "no-cache",
+                   body: form_data
+               }
+            )
+                .then(response => {
+                    return response.json();
+                })
+                .then((response_data) => {
+                    console.log(response_data)
+                    let post_id = response_data['post_id']
+                    let count = response_data['count']
+                    if (response_data['status'] === 200) {
+                        let btn_color
+                        let btn_num
+                        if (response_data['btn_type'] === 'add') {
+                            btn_color = '&#x2764'
+                            btn_num = count + 1
+
+                        } else {
+                            btn_color = '&#x1F5A4'
+                            btn_num = count - 1
+
+                        }
+
+                        $(`#id_btn_like_${post_id}`).html(btn_color)
+                        $(`#btn_num_${post_id}`).html(btn_num)
+
+                    }
+                })
+
+
+                .then((response_data) => {
+                    console.log(response_data)
+                    let foll_id = response_data['foll_id']
+                    let follows_count = response_data['count']
+                    if (response_data['status'] === 200) {
+                        let btn_num1
+                        if (response_data['btn_type'] === 'add') {
+                            btn_num1 = follows_count + 1
+
+                        } else {
+                            btn_num1 = follows_count - 1
+
+                        }
+
+                        $(`#btn_num_follows_${ foll_id }`).html(btn_num1)
+
+                    }
+                })
+        }
+
+        function NetWork(online){
+            console.log(online);
+            const element = document.querySelector(".status");
+            let users_name = element.dataset.user;
+            {#let users = JSON.parse(users_name);#}
+            if (users_name == online) {
+                {#element.classList.remove("offline");#}
+                element.classList.add("online");
+                element.innerHTML = "Online";
+            }
+            else{
+                {#element.classList.remove("online");#}
+                element.classList.add("offline");
+                element.innerHTML = "Offline";
+            }
+        }
+
+        window.addEventListener('load', () => {
+            NetWork(navigator.onLine);
+
+            window.addEventListener('online', () => {
+                NetWork(true);
+            });
+
+            window.addEventListener('offline', () => {
+                NetWork(false);
+            });
+        });
+    </script>
+{% endblock extra_js %}

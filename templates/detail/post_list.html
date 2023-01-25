@@ -1,0 +1,162 @@
+{% extends 'detail/base.html' %}
+{% load static %}
+
+{% block content %}
+    {% for post in posts %}
+        <div class="card" style="margin: 50px 600px; background-color: aqua">
+            <div class="card-header" style="width: 650px">
+                    {% if request.user == post.author %}
+
+                        <span style="margin-right: 20px; font-size:larger">your post</span>
+
+                    {% else %}
+
+                        {% for photo in photos1 %}
+                            {% if post.author == photo.author %}
+                                <img style="border-radius: 50%" src="{{ photo.photos.url }}" alt="image" height="60px" width="60px">
+
+                            {% endif %}
+                        {% endfor %}
+
+                    {% endif %}
+                        <span style="margin-right: 20px; font-size:larger; padding-left: 10px">{{ post.author }}</span>
+
+                <span style="font-weight: bolder; text-align: left">{{ post.date_posted }}</span>
+            </div>
+            <div class="card-body" style="box-shadow: black">
+{#            {% if post.photos_author.url == photos %}#}
+{#                <img id="images" src="{{ post.photos_author.url }}" >#}
+{#            {% endif %}#}
+                <h5 class="card-title" style="font-weight: bold">{{ post.title }}</h5>
+                <p class="card-text" style="font-weight: lighter">{{ post.content }}</p>
+                {% csrf_token %}
+                <br>
+                <hr>
+
+                    <div class="modal fade" id="exampleModalToggle_{{ post.id }}" aria-labelledby="exampleModalToggleLabel" tabindex="-1" style="display: none;" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalToggleLabel">Likes</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                              {% for user in users %}
+                                {% if user in post.likes.all %}
+                                    <button class="btn btn-success  btn-send" style="margin: 3px 5px;">
+                                        <a style="color: white; text-decoration: none;" id="name_list" href="{% url 'my_project_id' user.id %}">{{ user.username }}</a><br>
+                                    </button><br>
+                                {% endif %}
+                              {% endfor %}
+                          </div>
+                          <div class="modal-footer">
+                            <button class="btn btn-primary" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal">Ok</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <a class="btn btn-primary" data-bs-toggle="modal" href="#exampleModalToggle_{{ post.id }}" role="button">Likes</a>
+
+                    <button style="border: transparent; background-color: aqua;" type="button" name="post_id"
+                            value="{{ post.id }}" onclick="like_post('{{ post.pk }}')" id="id_btn_like_{{ post.pk }}">
+                        <div>{% if request.user in post.likes.all %}&#x2764 {% else %} &#x1F5A4 {% endif %}</div>
+                    </button>
+                    <span id="btn_num_{{ post.id }}">{{ post.likes.count }}</span>
+
+                    <div class="modal fade" id="saveexampleModalToggle_{{ post.id }}" aria-labelledby="exampleModalToggleLabel" tabindex="-1" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalToggleLabel">Comment</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    {% if post.comments.all %}
+                                        {% for comment in post.comments.all %}
+                                            {% if request.user == comment.author %}
+                                                <h6>your comment</h6>
+                                            {% elif comment.author == post.author %}
+                                                <h6 style="display: inline-block">post creator</h6> <a style="text-decoration: none; margin-left: 10px" href="#">{{ comment.author }}</a>
+                                            {% else %}
+                                                <h5>{{ comment.author }}</h5>
+                                            {% endif %}
+                                            <p>{{ comment.body }}</p><hr>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="modal-footer">
+                                    <a class="btn btn-primary" href="{% url 'post-comment' post.id %}">Comment</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <a style="margin-left:400px"  class="btn btn-primary" data-bs-toggle="modal" href="#saveexampleModalToggle_{{ post.id }}" role="button">Comment</a>
+            </div>
+        </div>
+    {% endfor %}
+
+
+{% endblock %}
+
+
+
+<body class="p-3 m-0 border-0 bd-example">
+
+    <!-- Example Code -->
+
+</body>
+
+
+
+{% block extra_js %}
+    <script>
+        function like_post(post_id) {
+            post_data('{% url 'like-post' %}', {'post_id': post_id})
+              if (post_id){
+                location.reload();
+              }
+        }
+
+
+        async function post_data(url, data) {
+            let form_data = new FormData();
+            for (let key in data) {
+                form_data.append(key, data[key]);
+            }
+            const response = await fetch(url,
+                {
+                    method: 'POST',
+                    cache: "no-cache",
+                    body: form_data
+                }
+            )
+                .then(response => {return response.json();})
+                .then((response_data) => {
+                    console.log(response_data)
+                    let post_id = response_data['post_id']
+                    let count = response_data['count']
+                    if (response_data['status'] === 200) {
+                        let btn_color
+                        let btn_num
+                        let name_like
+                        if (response_data['btn_type'] === 'add') {
+                            btn_color = '&#x2764'
+                            btn_num = count + 1
+
+                        } else {
+                            btn_color = '&#x1F5A4'
+                            btn_num = count - 1
+
+                        }
+
+                        $(`#id_btn_like_${post_id}`).html(btn_color)
+                        $(`#btn_num_${post_id}`).html(btn_num)
+
+                    }
+
+                })
+        }
+
+    </script>
+
+{% endblock extra_js %}

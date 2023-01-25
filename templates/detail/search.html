@@ -1,0 +1,17 @@
+{% extends 'detail/base.html' %}
+{% load static %}
+
+{% block content %}
+    {% for post in posts %}
+
+{#        <div class="card" style="margin: 50px 600px; background-color: aqua">#}
+{#            <div class="car d-header" style="width: 650px">#}
+                <span style="margin-right: 20px; font-size:larger; padding-left: 10px">{{ post.author }}</span>
+                <span style="font-weight: bolder; text-align: left">{{ post.date_posted }}</span>
+{#            </div>#}
+{#            <div class="card-body" style="box-shadow: black">#}
+    {% endfor %}
+{% endblock %}
+
+
+
